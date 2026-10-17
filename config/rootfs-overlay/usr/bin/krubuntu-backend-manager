@@ -1,0 +1,109 @@
+#!/bin/bash
+# Krubuntu Backend Manager
+# Easily enable/disable Flatpak (Flathub) and Snap support on Krubuntu
+
+set -e
+
+ACTION="${1:-}"
+
+is_flathub_enabled() {
+    if flatpak remotes 2>/dev/null | grep -q "flathub.*system"; then
+        if flatpak remotes -d 2>/dev/null | grep "^flathub" | grep -q "disabled"; then
+            return 1
+        else
+            return 0
+        fi
+    fi
+    return 1
+}
+
+is_snap_enabled() {
+    if systemctl is-enabled snapd.socket >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+toggle_flathub() {
+    if is_flathub_enabled; then
+        echo "Disabling Flathub..."
+        flatpak remote-modify --system --disable flathub 2>/dev/null || true
+        echo "Flathub is now disabled."
+    else
+        echo "Enabling Flathub..."
+        flatpak remote-add --if-not-exists --system flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+        flatpak remote-modify --system --enable flathub 2>/dev/null || true
+        echo "Flathub is now enabled!"
+    fi
+}
+
+toggle_snap() {
+    if is_snap_enabled; then
+        echo "Disabling Snapd services..."
+        sudo systemctl disable --now snapd.socket snapd.service 2>/dev/null || true
+        echo "Snap daemon is now disabled."
+    else
+        echo "Enabling Snapd services..."
+        sudo systemctl unmask snapd.service snapd.socket 2>/dev/null || true
+        sudo systemctl enable --now snapd.socket snapd.service 2>/dev/null || true
+        echo "Snap daemon is now enabled!"
+    fi
+}
+
+show_gui() {
+    local flat_status="[DISABLED]"
+    local snap_status="[DISABLED]"
+
+    if is_flathub_enabled; then
+        flat_status="[ENABLED]"
+    fi
+
+    if is_snap_enabled; then
+        snap_status="[ENABLED]"
+    fi
+
+    local choice
+    choice=$(kdialog --title "Krubuntu Software Backends" \
+        --radiolist "Select package backend to toggle (Default is Disabled for maximum performance & battery life):\n\nNote: You can also toggle Flathub directly inside KDE Discover -> Settings." \
+        "flatpak" "Flatpak (Flathub) - Currently $flat_status" off \
+        "snap" "Snap Packages (snapd) - Currently $snap_status" off \
+        2>/dev/null || true)
+
+    if [ "$choice" = "flatpak" ]; then
+        toggle_flathub
+        kdialog --title "Krubuntu Backend Manager" --msgbox "Flatpak status updated successfully! Refresh KDE Discover to see changes." 2>/dev/null || true
+    elif [ "$choice" = "snap" ]; then
+        toggle_snap
+        kdialog --title "Krubuntu Backend Manager" --msgbox "Snap status updated successfully! Refresh KDE Discover to see changes." 2>/dev/null || true
+    fi
+}
+
+case "$ACTION" in
+    --toggle-flatpak)
+        toggle_flathub
+        ;;
+    --toggle-snap)
+        toggle_snap
+        ;;
+    --status)
+        echo "=== Krubuntu Package Backends ==="
+        if is_flathub_enabled; then
+            echo "Flathub (Flatpak): ENABLED"
+        else
+            echo "Flathub (Flatpak): DISABLED (Discover toggle available)"
+        fi
+        if is_snap_enabled; then
+            echo "Snapd: ENABLED"
+        else
+            echo "Snapd: DISABLED"
+        fi
+        ;;
+    *)
+        if command -v kdialog >/dev/null 2>&1 && [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
+            show_gui
+        else
+            echo "Usage: krubuntu-backend-manager [--toggle-flatpak | --toggle-snap | --status]"
+        fi
+        ;;
+esac

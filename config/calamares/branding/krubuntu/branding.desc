@@ -1,0 +1,35 @@
+---
+componentName: krubuntu
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 880px,560px
+windowPlacement: center
+
+sidebar: widget
+navigation: widget
+
+strings:
+    productName:         Krubuntu
+    shortProductName:    Krubuntu
+    version:             26.04.1 LTS
+    shortVersion:        26.04
+    versionedName:       Krubuntu 26.04.1 LTS (Plasma Edition)
+    shortVersionedName:  Krubuntu 26.04
+    bootloaderEntryName: Krubuntu
+    productUrl:          https://github.com/krinry/krubuntu
+    supportUrl:          https://github.com/krinry/krubuntu/issues
+    knownIssuesUrl:      https://github.com/krinry/krubuntu/issues
+    releaseNotesUrl:     https://github.com/krinry/krubuntu
+
+images:
+    productLogo:         "krubuntu-logo.svg"
+    productIcon:         "krubuntu-logo.svg"
+    productWelcome:      "krubuntu-logo.svg"
+
+slideshow:               "show.qml"
+slideshowAPI: 2
+
+style:
+   Sidebar: "widget"
+   Navigation: "widget"

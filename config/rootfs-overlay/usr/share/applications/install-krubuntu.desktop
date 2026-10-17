@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install Krubuntu 26.04
+GenericName=Live System Installer
+Comment=Install Krubuntu permanently to your hard disk
+Exec=krubuntu-calamares
+Icon=calamares
+Terminal=false
+StartupNotify=true
+Categories=Qt;System;

@@ -1,0 +1,16 @@
+# Build workspaces
+build/
+output/*.iso
+output/*.sha256
+output/*.qcow2
+buildlog.txt
+
+# Cache downloads
+cache/*.tar.gz
+cache/*.iso
+
+# Temporary files
+*.swp
+*.bak
+*~
+.DS_Store

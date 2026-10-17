@@ -1,0 +1,19 @@
+# Krubuntu APT Policy
+# Prevent Ubuntu APT from silently installing Snap transitional dummy stubs
+# (e.g. chromium-browser, firefox dummy packages that force snaps)
+
+Package: snapd
+Pin: release a=resolute*
+Pin-Priority: 100
+
+Package: chromium-browser
+Pin: release *
+Pin-Priority: -1
+
+Package: firefox*
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000

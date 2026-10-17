@@ -1,0 +1,9 @@
+# Krubuntu Storage I/O Scheduler Optimization
+# NVMe drives: low-overhead direct queueing
+ACTION=="add|change", KERNEL=="nvme[0-9]*n[0-9]*", ATTR{queue/scheduler}="none"
+
+# SATA SSDs and eMMC: balanced latency
+ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="bfq"
+
+# Mechanical HDDs: fair queueing to prevent GUI starvation
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"

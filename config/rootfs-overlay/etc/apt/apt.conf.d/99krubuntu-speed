@@ -1,0 +1,4 @@
+// Krubuntu Fast APT Download Optimizations
+Acquire::http::Pipeline-Depth "5";
+Acquire::http::No-Cache "false";
+APT::Acquire::Retries "3";

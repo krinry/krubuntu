@@ -1,0 +1,43 @@
+/* Krubuntu Calamares Theme Stylesheet */
+#sidebarApp {
+    background-color: #232629;
+    color: #eff0f1;
+    font-size: 13px;
+}
+
+#logoWidget {
+    padding: 16px;
+    background-color: transparent;
+}
+
+#navigationWidget {
+    background-color: #31363b;
+    border-top: 1px solid #4d545b;
+}
+
+QPushButton {
+    background-color: #31363b;
+    color: #eff0f1;
+    border: 1px solid #4d545b;
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-width: 80px;
+}
+
+QPushButton:hover {
+    background-color: #3daee9;
+    color: #ffffff;
+    border-color: #3daee9;
+}
+
+QPushButton:pressed {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+QTextBrowser, QListView, QTreeView {
+    background-color: #232629;
+    color: #eff0f1;
+    border: 1px solid #4d545b;
+    border-radius: 4px;
+}

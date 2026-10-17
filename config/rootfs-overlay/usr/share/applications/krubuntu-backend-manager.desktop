@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Software Backends Manager
+GenericName=Snap & Flatpak Toggle
+Comment=Enable or disable Flatpak and Snap support on demand
+Exec=krubuntu-backend-manager
+Icon=preferences-system
+Terminal=false
+StartupNotify=true
+Categories=Qt;KDE;System;Settings;

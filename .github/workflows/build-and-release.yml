@@ -1,0 +1,150 @@
+name: Build and Release Krubuntu ISO
+
+on:
+  push:
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release Tag (e.g. v26.04.1)'
+        required: false
+        default: ''
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-iso:
+    name: Build Krubuntu Live ISO
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Maximize Runner Disk Space
+        run: |
+          echo "Initial disk space:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -a -f 2>/dev/null || true
+          echo "Cleaned disk space:"
+          df -h
+
+      - name: Build Krubuntu ISO via Docker
+        run: |
+          chmod +x build.sh scripts/*.sh
+          ./build.sh --docker
+
+      - name: Verify ISO and Generate Checksums
+        run: |
+          sudo chown -R $USER:$USER output || sudo chmod -R 777 output || true
+          cd output
+          ls -lh
+          sha256sum Krubuntu-*.iso > Krubuntu-26.04.1-amd64.iso.sha256
+          sha256sum -c Krubuntu-26.04.1-amd64.iso.sha256
+          echo "ISO_NAME=$(ls Krubuntu-*.iso)" >> $GITHUB_ENV
+          echo "ISO_SHA256=$(cat Krubuntu-26.04.1-amd64.iso.sha256 | awk '{print $1}')" >> $GITHUB_ENV
+
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Krubuntu-ISO-and-Checksum
+          path: |
+            output/Krubuntu-*.iso
+            output/*.sha256
+          retention-days: 7
+
+      - name: Publish Pull Request Release
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PR_TAG="pr-${PR_NUM}"
+          TITLE="Krubuntu PR Build #${PR_NUM} (${SHA:0:7})"
+          
+          # Delete existing release for this PR tag if it already exists
+          gh release delete "$PR_TAG" --yes --cleanup-tag 2>/dev/null || true
+          
+          cat << 'EOF' > pr_notes.md
+          ### 🚀 Krubuntu Automated Pull Request Build
+          
+          This is an automated ISO build generated for Pull Request #${{ github.event.pull_request.number }}.
+          
+          * **Commit SHA:** `${{ github.event.pull_request.head.sha }}`
+          * **ISO Image:** `${{ env.ISO_NAME }}`
+          * **SHA256:** `${{ env.ISO_SHA256 }}`
+          
+          #### How to Test:
+          1. Download the ISO attached below.
+          2. Test in QEMU or flash to a USB drive with Rufus / BalenaEtcher / Ventoy.
+          EOF
+          
+          gh release create "$PR_TAG" \
+            output/Krubuntu-*.iso \
+            output/*.sha256 \
+            --title "$TITLE" \
+            --notes-file pr_notes.md \
+            --prerelease
+
+      - name: Comment PR with ISO Download Info
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const isoName = process.env.ISO_NAME;
+            const sha256 = process.env.ISO_SHA256;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const releaseUrl = `https://github.com/${owner}/${repo}/releases/tag/pr-${prNumber}`;
+            
+            const commentBody = `### 💿 Krubuntu ISO Build Ready!\n\n` +
+              `An automated bootable ISO image has been built and published for this PR:\n\n` +
+              `* **Release:** [Download PR #${prNumber} ISO](${releaseUrl})\n` +
+              `* **ISO File:** \`${isoName}\`\n` +
+              `* **SHA256 Checksum:** \`${sha256}\`\n\n` +
+              `You can download the ISO directly from the release link above or from the workflow artifacts.`;
+              
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+
+      - name: Publish Official GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag != '')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "main" ]; then
+            TAG_NAME="${{ github.event.inputs.release_tag }}"
+          fi
+          
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Release $TAG_NAME already exists, uploading assets..."
+            gh release upload "$TAG_NAME" output/Krubuntu-*.iso output/*.sha256 --clobber
+          else
+            echo "Creating new release $TAG_NAME..."
+            gh release create "$TAG_NAME" \
+              output/Krubuntu-*.iso \
+              output/*.sha256 \
+              --title "Krubuntu ${TAG_NAME} LTS (KDE Plasma Edition)" \
+              --generate-notes \
+              --notes "## 🌟 Krubuntu Official Release ${TAG_NAME}\n\n* **ISO File:** \`${{ env.ISO_NAME }}\`\n* **SHA256:** \`${{ env.ISO_SHA256 }}\`\n\nSee [Installation Guide](docs/INSTALLATION_GUIDE.md) and [Architecture](docs/ARCHITECTURE.md) for full details."
+          fi

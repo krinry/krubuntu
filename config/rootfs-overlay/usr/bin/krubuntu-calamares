@@ -1,0 +1,20 @@
+#!/bin/bash
+# Krubuntu Calamares Installer Launcher
+# Sets up Wayland / X11 display permissions for root GUI
+
+set -e
+
+# Permit local root connection to display server
+if command -v xhost >/dev/null 2>&1; then
+    xhost +local:root >/dev/null 2>&1 || true
+fi
+
+# Ensure display is set
+export DISPLAY="${DISPLAY:-:0}"
+
+# Provide fallback to xcb if Wayland socket permission is restricted
+if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    export QT_QPA_PLATFORM="wayland;xcb"
+fi
+
+exec sudo -E /usr/bin/calamares "$@"

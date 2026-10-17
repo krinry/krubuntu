@@ -1,0 +1,171 @@
+# Krubuntu Production Package Manifest
+# Pure, Bloat-Free, Hardware-Enabled KDE Plasma Desktop
+
+# ==============================================================================
+# 1. CORE SYSTEM, KERNEL & BOOTLOADER
+# ==============================================================================
+linux-generic
+casper
+laptop-detect
+os-prober
+grub-efi-amd64-bin
+grub-pc-bin
+shim-signed
+locales
+sudo
+ca-certificates
+
+# ==============================================================================
+# 2. HARDWARE FIRMWARE & AUDIO/VIDEO DRIVERS
+# ==============================================================================
+linux-firmware
+firmware-sof-signed
+alsa-ucm-conf
+alsa-utils
+mesa-va-drivers
+mesa-vulkan-drivers
+libgl1-mesa-dri
+intel-media-va-driver
+xserver-xorg-video-all
+
+# ==============================================================================
+# 3. DISPLAY SERVER, KDE PLASMA DESKTOP & DISPLAY MANAGEMENT
+# ==============================================================================
+sddm
+plasma-desktop
+plasma-workspace
+plasma-session-wayland
+kwin-wayland
+xwayland
+kscreen
+breeze
+breeze-icon-theme
+
+# ==============================================================================
+# 4. AUDIO & MICROPHONE STACK (PipeWire / WirePlumber)
+# ==============================================================================
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+libspa-0.2-bluetooth
+plasma-pa
+
+# ==============================================================================
+# 5. NETWORKING & BLUETOOTH
+# ==============================================================================
+network-manager
+systemd-resolved
+plasma-nm
+wpasupplicant
+wireless-regdb
+iw
+rfkill
+modemmanager
+bluez
+bluez-tools
+bluedevil
+firmware-ath9k-htc
+firmware-carl9170
+
+# ==============================================================================
+# 6. POWER, MEMORY & PERFORMANCE MANAGEMENT
+# ==============================================================================
+powerdevil
+power-profiles-daemon
+upower
+brightnessctl
+kinfocenter
+plasma-systemmonitor
+systemd-zram-generator
+earlyoom
+
+# ==============================================================================
+# 7. DESKTOP INTEGRATION, STORAGE & SECURITY
+# ==============================================================================
+polkit-kde-agent-1
+xdg-desktop-portal
+xdg-desktop-portal-kde
+udisks2
+ntfs-3g
+exfatprogs
+dosfstools
+print-manager
+cups-pk-helper
+ufw
+plasma-firewall
+
+# ==============================================================================
+# 8. DAY-TO-DAY ESSENTIALS, MEDIA & APPS
+# ==============================================================================
+firefox
+plasma-browser-integration
+vlc
+okular
+systemsettings
+dolphin
+konsole
+kwrite
+ark
+gwenview
+kde-spectacle
+partitionmanager
+kio-extras
+ffmpegthumbs
+ffmpeg
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly
+gstreamer1.0-libav
+gstreamer1.0-pipewire
+gstreamer1.0-vaapi
+
+# ==============================================================================
+# 9. SOFTWARE CENTER & BACKENDS
+# ==============================================================================
+discover
+plasma-discover
+plasma-discover-backend-flatpak
+plasma-discover-backend-snap
+plasma-discover-backend-fwupd
+flatpak
+snapd
+packagekit
+appstream
+software-properties-qt
+
+# ==============================================================================
+# 10. FONTS & LOCALIZATION
+# ==============================================================================
+fonts-noto-core
+fonts-noto-color-emoji
+fonts-indic
+fonts-liberation
+fonts-dejavu-core
+
+# ==============================================================================
+# 11. ARCHIVE & COMPRESSION UTILITIES
+# ==============================================================================
+p7zip-full
+unzip
+zip
+unrar-free
+tar
+xz-utils
+zstd
+
+# ==============================================================================
+# 12. TERMINAL & SYSTEM UTILITIES
+# ==============================================================================
+curl
+wget
+htop
+fastfetch
+nano
+git
+
+# ==============================================================================
+# 13. INSTALLER
+# ==============================================================================
+calamares
+calamares-settings-ubuntu-common

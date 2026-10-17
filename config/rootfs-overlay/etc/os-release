@@ -1,0 +1,12 @@
+NAME="Krubuntu"
+VERSION="26.04.1 LTS (Plasma Edition)"
+ID=krubuntu
+ID_LIKE="ubuntu debian"
+PRETTY_NAME="Krubuntu 26.04.1 LTS"
+VERSION_ID="26.04"
+HOME_URL="https://github.com/krinry/krubuntu"
+SUPPORT_URL="https://github.com/krinry/krubuntu/issues"
+BUG_REPORT_URL="https://github.com/krinry/krubuntu/issues"
+PRIVACY_POLICY_URL="https://github.com/krinry/krubuntu"
+UBUNTU_CODENAME=resolute
+LOGO=krubuntu-logo
